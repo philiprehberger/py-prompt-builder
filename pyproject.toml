@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "philiprehberger-prompt-builder"
+version = "0.1.0"
+description = "Type-safe prompt template builder for LLM APIs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Philip Rehberger" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Typing :: Typed",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/philiprehberger_prompt_builder"]

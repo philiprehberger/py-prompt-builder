@@ -81,6 +81,14 @@ estimated = prompt.estimate_tokens(text="Hello world")
 | `.render(**kwargs)` | Render with variable substitution → list of dicts |
 | `.estimate_tokens(**kwargs)` | Rough token count (~4 chars/token) |
 
+
+## Development
+
+```bash
+pip install -e .
+python -m pytest tests/ -v
+```
+
 ## License
 
 MIT

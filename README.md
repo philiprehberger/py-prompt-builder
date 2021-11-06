@@ -6,7 +6,7 @@
 
 Type-safe prompt template builder for LLM APIs.
 
-## Install
+## Installation
 
 ```bash
 pip install philiprehberger-prompt-builder

@@ -14,8 +14,6 @@ pip install philiprehberger-prompt-builder
 
 ## Usage
 
-### Fluent Builder
-
 ```python
 from philiprehberger_prompt_builder import Prompt
 
@@ -32,6 +30,8 @@ messages = (
 ### Few-Shot Examples
 
 ```python
+from philiprehberger_prompt_builder import Prompt
+
 messages = (
     Prompt()
     .system("Classify the sentiment.")
@@ -42,9 +42,53 @@ messages = (
 )
 ```
 
+### Batch Few-Shot Examples
+
+```python
+from philiprehberger_prompt_builder import Prompt
+
+messages = (
+    Prompt()
+    .system("Translate English to French.")
+    .with_examples([
+        ("Hello", "Bonjour"),
+        ("Goodbye", "Au revoir"),
+        ("Thank you", "Merci"),
+    ])
+    .user("{text}")
+    .render(text="Good morning")
+)
+```
+
+### Output Format Instructions
+
+```python
+from philiprehberger_prompt_builder import Prompt
+
+# Request JSON output
+messages = (
+    Prompt()
+    .system("Extract structured data.")
+    .user("Parse: {text}")
+    .expect_json(description='{"name": string, "age": number}')
+    .render(text="John is 30 years old")
+)
+
+# Request list output
+messages = (
+    Prompt()
+    .system("Generate ideas.")
+    .user("List 5 project ideas about {topic}")
+    .expect_list()
+    .render(topic="machine learning")
+)
+```
+
 ### Conditional Content
 
 ```python
+from philiprehberger_prompt_builder import Prompt
+
 use_examples = True
 
 messages = (
@@ -60,11 +104,11 @@ messages = (
 ### Prompt Composition
 
 ```python
-# Build reusable prompt fragments
+from philiprehberger_prompt_builder import Prompt
+
 preamble = Prompt().system("You are a coding assistant.").user("Use Python 3.12+.")
 task = Prompt().user("Write a function that {task}")
 
-# Merge fragments into a single prompt
 combined = preamble.merge(task)
 messages = combined.render(task="sorts a list")
 ```
@@ -80,20 +124,37 @@ summarizer = PromptTemplate(
     defaults={"tone": "concise", "format": "bullet points"},
 )
 
-# Use with defaults
 messages = summarizer.render(content="Article text...")
-
-# Override defaults
 messages = summarizer.render(content="...", tone="detailed", format="paragraphs")
 
-# Create variant
 verbose = summarizer.extend(tone="thorough", format="essay")
+```
+
+### Prompt Versioning
+
+```python
+from philiprehberger_prompt_builder import Prompt, PromptVersionStore
+
+store = PromptVersionStore()
+
+v1 = Prompt().system("You are helpful.").user("Answer: {question}")
+store.save("v1", v1)
+
+v2 = Prompt().system("You are a concise expert.").user("Answer briefly: {question}")
+store.save("v2", v2)
+
+prompt = store.load("v1")
+messages = prompt.render(question="What is Python?")
+
+store.list_versions()  # ["v1", "v2"]
 ```
 
 ### Token Estimation
 
 ```python
-prompt = Prompt().system("...").user("{text}")
+from philiprehberger_prompt_builder import Prompt
+
+prompt = Prompt().system("You are helpful.").user("{text}")
 estimated = prompt.estimate_tokens(text="Hello world")
 ```
 
@@ -107,12 +168,21 @@ estimated = prompt.estimate_tokens(text="Hello world")
 | `.assistant(content)` | Add an assistant message |
 | `.message(role, content)` | Add a message with any role |
 | `.example(user, assistant)` | Add a few-shot example pair |
+| `.with_examples(examples)` | Add multiple few-shot examples from a list of (input, output) tuples |
+| `.expect_json(description)` | Append instruction requesting JSON output |
+| `.expect_list(description)` | Append instruction requesting list output |
 | `.conditional(include, role, content)` | Conditionally add a message if `include` is truthy |
 | `.merge(other)` | Create a new Prompt combining messages from self and other |
 | `.render(**kwargs)` | Render with variable substitution, returns list of dicts |
 | `.render_messages(**kwargs)` | Render and return Message objects |
-| `.estimate_tokens(**kwargs)` | Rough token count (~4 chars/token) |
+| `.estimate_tokens(**kwargs)` | Approximate token count using word heuristics |
 | `PromptTemplate` | Reusable prompt template with default values |
+| `.extend(**overrides)` | Create a new template with updated defaults |
+| `PromptVersionStore` | Store and retrieve named prompt versions |
+| `.save(name, prompt)` | Save a prompt snapshot under a name |
+| `.load(name)` | Retrieve a stored prompt version by name |
+| `.list_versions()` | List all stored version names |
+| `.delete(name)` | Delete a stored prompt version |
 | `Message` | A single message with role and content |
 
 ## Development

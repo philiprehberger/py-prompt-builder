@@ -1,5 +1,9 @@
 # philiprehberger-prompt-builder
 
+[![Tests](https://github.com/philiprehberger/py-prompt-builder/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/py-prompt-builder/actions/workflows/publish.yml)
+[![PyPI version](https://img.shields.io/pypi/v/philiprehberger-prompt-builder.svg)](https://pypi.org/project/philiprehberger-prompt-builder/)
+[![License](https://img.shields.io/github/license/philiprehberger/py-prompt-builder)](LICENSE)
+
 Type-safe prompt template builder for LLM APIs.
 
 ## Install

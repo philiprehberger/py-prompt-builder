@@ -84,6 +84,54 @@ class Prompt:
         """Get raw messages without rendering."""
         return list(self._messages)
 
+    def conditional(self, include: bool, role: Role, content: str) -> Prompt:
+        """Conditionally add a message.
+
+        If include is truthy, add a message with the given role and content.
+        If falsy, return self unchanged.
+
+        Args:
+            include: Whether to include the message.
+            role: The message role (e.g., "system", "user", "assistant").
+            content: The message content.
+
+        Returns:
+            Self for chaining.
+        """
+        if include:
+            self._messages.append(Message(role=role, content=content))
+        return self
+
+    def merge(self, other: Prompt) -> Prompt:
+        """Create a new Prompt containing messages from self and other.
+
+        All messages from self are included first, followed by all messages
+        from other. The system message from self takes priority; if self has
+        no system message, the system message from other is preserved.
+
+        Args:
+            other: Another Prompt to merge in.
+
+        Returns:
+            A new Prompt with combined messages.
+        """
+        result = Prompt()
+
+        self_system = [m for m in self._messages if m.role == "system"]
+        other_system = [m for m in other._messages if m.role == "system"]
+        self_non_system = [m for m in self._messages if m.role != "system"]
+        other_non_system = [m for m in other._messages if m.role != "system"]
+
+        # Use system message from self, or fall back to other
+        system_msgs = self_system if self_system else other_system
+
+        result._messages = (
+            list(system_msgs)
+            + list(self_non_system)
+            + list(other_non_system)
+        )
+        return result
+
     def estimate_tokens(self, **kwargs: Any) -> int:
         """Rough token count estimate (~4 chars per token)."""
         rendered = self.render(**kwargs)

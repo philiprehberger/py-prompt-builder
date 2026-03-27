@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 (2026-03-27)
+
+- Add `Prompt.conditional()` for conditionally including messages without external if/else
+- Add `Prompt.merge()` for composing modular prompt fragments into a single prompt
+
 ## 0.1.7 (2026-03-22)
 
 - Add pytest and mypy configuration to pyproject.toml

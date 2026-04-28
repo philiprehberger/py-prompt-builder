@@ -214,6 +214,38 @@ class Prompt:
         char_estimate = total_chars // 4
         return max(word_estimate, char_estimate)
 
+    def warn_if_over(self, limit: int, **kwargs: Any) -> list[str]:
+        """Return human-readable warnings when the prompt may exceed *limit* tokens.
+
+        Uses :meth:`estimate_tokens` for a heuristic count. The warnings include
+        an "approaching the limit" advisory at 80% utilisation and an "exceeds
+        the limit" warning above the limit. Returns an empty list when the
+        estimate is comfortably under *limit*.
+
+        Args:
+            limit: Token budget to check against (e.g. a model's context window).
+            **kwargs: Variables for placeholder substitution before counting.
+
+        Returns:
+            List of warning strings — empty if there is nothing to flag.
+        """
+        if limit <= 0:
+            raise ValueError("limit must be positive")
+
+        estimate = self.estimate_tokens(**kwargs)
+        warnings: list[str] = []
+
+        if estimate > limit:
+            warnings.append(
+                f"Prompt estimate {estimate} tokens exceeds limit of {limit}"
+            )
+        elif estimate >= int(limit * 0.8):
+            warnings.append(
+                f"Prompt estimate {estimate} tokens approaching limit of {limit}"
+            )
+
+        return warnings
+
 
 class PromptTemplate:
     """Reusable prompt template with default values."""

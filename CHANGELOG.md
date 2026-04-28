@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 (2026-04-27)
+
+- Add `Prompt.warn_if_over(limit)` returning warning strings when the estimated token count is approaching or exceeds a context window
+- Returns warnings (not exceptions) so callers can decide their own gating behaviour
+
 ## 0.3.0 (2026-04-01)
 
 - Add `with_examples()` for batch few-shot example insertion

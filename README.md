@@ -158,6 +158,18 @@ prompt = Prompt().system("You are helpful.").user("{text}")
 estimated = prompt.estimate_tokens(text="Hello world")
 ```
 
+### Context-Window Warnings
+
+```python
+prompt = Prompt().user("very long input...")
+
+warnings = prompt.warn_if_over(limit=8192)
+for w in warnings:
+    print("WARN:", w)
+```
+
+Returns warning strings (not exceptions) when the estimated token count is approaching or exceeds the limit, so callers can decide whether to truncate, summarise, or proceed.
+
 ## API
 
 | Function / Class | Description |
@@ -176,6 +188,7 @@ estimated = prompt.estimate_tokens(text="Hello world")
 | `.render(**kwargs)` | Render with variable substitution, returns list of dicts |
 | `.render_messages(**kwargs)` | Render and return Message objects |
 | `.estimate_tokens(**kwargs)` | Approximate token count using word heuristics |
+| `.warn_if_over(limit, **kwargs)` | List warnings when estimated tokens approach or exceed `limit` |
 | `PromptTemplate` | Reusable prompt template with default values |
 | `.extend(**overrides)` | Create a new template with updated defaults |
 | `PromptVersionStore` | Store and retrieve named prompt versions |

@@ -1,5 +1,7 @@
 """Tests for the Prompt builder class."""
 
+import pytest
+
 from philiprehberger_prompt_builder import Message, Prompt
 
 
@@ -266,3 +268,32 @@ class TestEstimateTokens:
         short = Prompt().user("Hi")
         long = Prompt().user("This is a much longer message with many more words in it")
         assert long.estimate_tokens() > short.estimate_tokens()
+
+
+class TestWarnIfOver:
+    def test_empty_prompt_no_warnings(self):
+        assert Prompt().warn_if_over(1000) == []
+
+    def test_under_limit_no_warnings(self):
+        assert Prompt().user("Hi").warn_if_over(10000) == []
+
+    def test_over_limit_returns_warning(self):
+        text = "word " * 500
+        warnings = Prompt().user(text).warn_if_over(50)
+        assert warnings
+        assert "exceeds" in warnings[0]
+
+    def test_approaching_limit_returns_warning(self):
+        prompt = Prompt().user("word " * 100)
+        estimate = prompt.estimate_tokens()
+        # Pick limit so estimate is ~85% of limit (above 80% threshold)
+        limit = int(estimate / 0.85)
+        warnings = prompt.warn_if_over(limit)
+        assert warnings
+        assert "approaching" in warnings[0]
+
+    def test_invalid_limit_raises(self):
+        with pytest.raises(ValueError):
+            Prompt().warn_if_over(0)
+        with pytest.raises(ValueError):
+            Prompt().warn_if_over(-5)

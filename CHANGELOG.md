@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0 (2026-05-30)
+
+- Add `Prompt.role_counts()` returning a dict of role → message count
+- Add `Prompt.is_empty()` for quick "no messages" check
+
 ## 0.4.0 (2026-04-27)
 
 - Add `Prompt.warn_if_over(limit)` returning warning strings when the estimated token count is approaching or exceeds a context window

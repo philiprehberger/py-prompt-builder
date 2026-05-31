@@ -214,6 +214,21 @@ class Prompt:
         char_estimate = total_chars // 4
         return max(word_estimate, char_estimate)
 
+    def role_counts(self) -> dict[str, int]:
+        """Return a dict mapping each role to the number of messages with that role.
+
+        Useful for sanity-checking a long conversation (e.g. asserting that
+        user and assistant message counts are balanced).
+        """
+        counts: dict[str, int] = {}
+        for msg in self._messages:
+            counts[msg.role] = counts.get(msg.role, 0) + 1
+        return counts
+
+    def is_empty(self) -> bool:
+        """Return True if no messages have been added to this prompt."""
+        return len(self._messages) == 0
+
     def warn_if_over(self, limit: int, **kwargs: Any) -> list[str]:
         """Return human-readable warnings when the prompt may exceed *limit* tokens.
 

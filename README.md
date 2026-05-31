@@ -158,6 +158,24 @@ prompt = Prompt().system("You are helpful.").user("{text}")
 estimated = prompt.estimate_tokens(text="Hello world")
 ```
 
+### Inspecting prompt state
+
+```python
+from philiprehberger_prompt_builder import Prompt
+
+p = Prompt()
+p.is_empty()  # True
+p.role_counts()  # {}
+
+p.system("Be helpful.").user("Hi").user("Still there?").assistant("Yes!")
+p.is_empty()  # False
+p.role_counts()  # {"system": 1, "user": 2, "assistant": 1}
+
+# Sanity-check a long conversation
+counts = p.role_counts()
+assert counts.get("user", 0) == counts.get("assistant", 0) + 1
+```
+
 ### Context-Window Warnings
 
 ```python
@@ -189,6 +207,8 @@ Returns warning strings (not exceptions) when the estimated token count is appro
 | `.render_messages(**kwargs)` | Render and return Message objects |
 | `.estimate_tokens(**kwargs)` | Approximate token count using word heuristics |
 | `.warn_if_over(limit, **kwargs)` | List warnings when estimated tokens approach or exceed `limit` |
+| `.role_counts()` | Dict mapping each role to the number of messages with that role |
+| `.is_empty()` | Return True if no messages have been added |
 | `PromptTemplate` | Reusable prompt template with default values |
 | `.extend(**overrides)` | Create a new template with updated defaults |
 | `PromptVersionStore` | Store and retrieve named prompt versions |

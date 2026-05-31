@@ -270,6 +270,33 @@ class TestEstimateTokens:
         assert long.estimate_tokens() > short.estimate_tokens()
 
 
+class TestRoleCountsAndIsEmpty:
+    def test_fresh_prompt_is_empty(self):
+        p = Prompt()
+        assert p.is_empty() is True
+        assert p.role_counts() == {}
+
+    def test_populated_prompt_role_counts(self):
+        p = Prompt().system("a").user("b").user("c").assistant("d")
+        assert p.is_empty() is False
+        assert p.role_counts() == {"system": 1, "user": 2, "assistant": 1}
+
+    def test_example_role_counts(self):
+        # example() adds a user + assistant pair
+        p = Prompt().example("u", "a")
+        assert p.is_empty() is False
+        assert p.role_counts() == {"user": 1, "assistant": 1}
+
+    def test_zero_count_roles_not_included(self):
+        p = Prompt().user("only user")
+        counts = p.role_counts()
+        assert counts == {"user": 1}
+        assert "system" not in counts
+        assert "assistant" not in counts
+        # Consumers can use .get(role, 0)
+        assert counts.get("system", 0) == 0
+
+
 class TestWarnIfOver:
     def test_empty_prompt_no_warnings(self):
         assert Prompt().warn_if_over(1000) == []
